@@ -8,11 +8,28 @@ import com.example.demo.models.Id;
 import com.example.demo.services.IValidateId;
 import com.example.demo.services.ServiceBuilder;
 
+import java.net.URISyntaxException;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ValidateIdActivity extends AppCompatActivity {
+
+    private Socket socket;
+    {
+        try {
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.reconnection = true;
+            socket = IO.socket("BASEURL");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +43,18 @@ public class ValidateIdActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<Id> request, Response<Id> response) {
+                
+                socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {}
+                }).on("event", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {}
+                }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {}
+                });
+                socket.connect();
             }
 
             @Override
